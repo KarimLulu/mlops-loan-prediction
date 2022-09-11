@@ -37,7 +37,7 @@ LGBM_PARAMS = {
     "feature_fraction_bynode": 0.9,
     "max_bin": 255,
     "learning_rate": 0.1,
-    "n_estimators": 100,
+    "n_estimators": 50,
     "reg_alpha": 1e-1,
     "reg_lambda": 1e-1,
     "random_state": 30,
@@ -45,13 +45,12 @@ LGBM_PARAMS = {
     "metric": "",
     "n_jobs": -1,  # does not influence reproducibility in the latest version.
     "verbose": -1,
-    "early_stopping_round": 50,
     "first_metric_only": False
 }
 
 GRID_SEARCH_PARAMS = {
-    "reg_alpha": [1e-2],
-    "reg_lambda": [1e-2],
+    "lgbmclassifier__reg_alpha": [1e-2],
+    "lgbmclassifier__reg_lambda": [1e-2],
 }
 EXPERIMENT_NAME = "loan-prediction"
 TRACKING_URI = "http://127.0.0.1:5000"
