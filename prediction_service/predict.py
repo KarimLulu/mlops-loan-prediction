@@ -8,6 +8,7 @@ RUN_ID = os.getenv('RUN_ID', 'df5973fcf13a45e7a7a04136603bc8cc')
 BUCKET_NAME = os.getenv('BUCKET_NAME', 'mlops-loan-prediction')
 
 logged_model = f's3://{BUCKET_NAME}/1/{RUN_ID}/artifacts/model'
+print(logged_model)
 model = mlflow.pyfunc.load_model(logged_model)
 
 
@@ -30,9 +31,9 @@ app = Flask('loan-prediction')
 
 @app.route('/predict', methods=['POST'])
 def predict_endpoint():
-    ride = request.get_json()
+    payload = request.get_json()
 
-    features = prepare_features(ride)
+    features = prepare_features(payload)
     pred = predict(features)
 
     result = {

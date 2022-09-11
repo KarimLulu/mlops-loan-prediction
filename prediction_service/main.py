@@ -11,7 +11,7 @@ from prefect.infrastructure import Process
 from prefect.task_runners import SequentialTaskRunner
 from sklearn.model_selection import train_test_split
 
-from model.estimator import read_dataframe, add_features, tune_parameters, evaluate_model
+from prediction_service.estimator import read_dataframe, add_features, tune_parameters, evaluate_model
 from settings import DATA_PATH, EXPERIMENT_NAME, TRACKING_URI
 
 
@@ -32,22 +32,22 @@ def train_best_model(model, data_path, best_params):
         )
         loss = evaluate_model(model, y_test, test_dicts)
         mlflow.log_metric('log_loss', loss)
-        mlflow.sklearn.log_model(model, artifact_path="model")
+        mlflow.sklearn.log_model(model, artifact_path="prediction_service")
 
 
 #@task
 def register_model(test_metric='log_loss', registered_model_name='loan-predictor'):
 
     client = MlflowClient()
-    # select the model with the lowest test log loss
+    # select the prediction_service with the lowest test log loss
     experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
     best_run = client.search_runs(
         experiment_ids=experiment.experiment_id,
         order_by=[f"metrics.{test_metric} ASC"],
         max_results=1)[0]
     logger.info(f"Best test log loss {best_run.data.metrics[test_metric]}")
-    # Register the best model
-    model_uri = f"runs:/{best_run.info.run_id}/model"
+    # Register the best prediction_service
+    model_uri = f"runs:/{best_run.info.run_id}/prediction_service"
     model_version = mlflow.register_model(model_uri=model_uri, name=registered_model_name)
     client.transition_model_version_stage(
         name=registered_model_name,

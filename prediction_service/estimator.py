@@ -55,7 +55,7 @@ def tune_parameters(path):
             pipeline.fit(train_dicts, y_train)
             loss = evaluate_model(pipeline, y_test, test_dicts)
             mlflow.log_metric('log_loss', loss)
-            mlflow.sklearn.log_model(pipeline, artifact_path="model")
+            mlflow.sklearn.log_model(pipeline, artifact_path="prediction_service")
             if loss > best_loss:
                 best_loss = loss
                 best_params = pipeline.get_params()
