@@ -6,6 +6,7 @@ import category_encoders as ce
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
+import mlflow
 from sklearn.metrics import log_loss, f1_score
 from sklearn.model_selection import ParameterGrid, StratifiedKFold
 
@@ -49,7 +50,7 @@ class Estimator(object):
             if dtype == "object" or dtype.name == "category":
                 categorical_columns.append(column_name)
         if encoder_params is None:
-            encoder_params = {}
+            encoder_params = {'random_state': 42}
         encoder_params = {**encoder_params, "cols": categorical_columns}
         self.category_encoder.set_params(**encoder_params)
         self.category_encoder.fit(X, *args, **kwargs)
@@ -109,21 +110,25 @@ class Estimator(object):
                         "log_loss": -np.inf}
         best_params = {}
         for params in ParameterGrid(GRID_SEARCH_PARAMS):
-            self.lgb_model.set_params(**params)
-            fold_metrics = []
-            for train_index, test_index in cross_validator.split(X, y):
-                X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-                y_train, y_test = y[train_index], y[test_index]
-                self.fit(X_train, y_train,
-                         encoder_params=encoder_params,
-                         eval_set=[(X_test, y_test)],
-                         eval_metric=lgb_f1_score,
-                         verbose=-1)
-                metrics = self.evaluate(X_test, y_test)
-                fold_metrics.append(metrics)
-            avg_metrics = pd.DataFrame(fold_metrics).mean().to_dict()
-            if avg_metrics[metric] > best_metrics[metric]:
-                best_metrics = avg_metrics
-                best_params = self.lgb_model.get_params(deep=False)
-        return {**best_params,
-                "scores": best_metrics}
+            with mlflow.start_run():
+                self.lgb_model.set_params(**params)
+                fold_metrics = []
+                mlflow.log_params(params)
+                for train_index, test_index in cross_validator.split(X, y):
+                    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+                    y_train, y_test = y[train_index], y[test_index]
+                    self.fit(X_train, y_train,
+                             encoder_params=encoder_params,
+                             eval_set=[(X_test, y_test)],
+                             eval_metric=lgb_f1_score,
+                             verbose=-1)
+                    metrics = self.evaluate(X_test, y_test)
+                    fold_metrics.append(metrics)
+                avg_metrics = pd.DataFrame(fold_metrics).mean().to_dict()
+                for metric, value in avg_metrics.items():
+                    mlflow.log_metric(metric, value)
+                mlflow.lightgbm.log_model(self.lgb_model, artifact_path="models_mlflow")
+                if avg_metrics[metric] > best_metrics[metric]:
+                    best_metrics = avg_metrics
+                    best_params = self.lgb_model.get_params(deep=False)
+        return best_params

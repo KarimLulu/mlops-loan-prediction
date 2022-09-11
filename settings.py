@@ -50,8 +50,8 @@ LGBM_PARAMS = {
 }
 
 GRID_SEARCH_PARAMS = {
-    "reg_alpha": [1e-2, 1e-1, 1],
-    "reg_lambda": [1e-2, 1e-1, 1],
+    "reg_alpha": [1e-2],
+    "reg_lambda": [1e-2],
 }
 
 
