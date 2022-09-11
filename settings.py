@@ -53,6 +53,8 @@ GRID_SEARCH_PARAMS = {
     "reg_alpha": [1e-2],
     "reg_lambda": [1e-2],
 }
+EXPERIMENT_NAME = "loan-prediction"
+TRACKING_URI = "http://127.0.0.1:5000"
 
 
 try:

@@ -6,6 +6,7 @@ import category_encoders as ce
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
+from prefect import task
 import mlflow
 from sklearn.metrics import log_loss, f1_score
 from sklearn.model_selection import ParameterGrid, StratifiedKFold
@@ -95,6 +96,7 @@ class Estimator(object):
         return {"f1_score": f1,
                 "log_loss": loss}
 
+    @task
     def tune_parameters(self,
                         X: pd.DataFrame,
                         y: np.ndarray,

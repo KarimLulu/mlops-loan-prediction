@@ -1,33 +1,28 @@
+from datetime import timedelta
 import logging
-import pandas as pd
+
 import mlflow
 from mlflow.tracking import MlflowClient
-from mlflow.entities import ViewType
+import pandas as pd
+from prefect import flow, task
+from prefect.deployments import Deployment
+from prefect.orion.schemas.schedules import IntervalSchedule
+from prefect.infrastructure import Process
+from prefect.task_runners import SequentialTaskRunner
 from sklearn.model_selection import train_test_split
 
 from model.estimator import Estimator
 from model.helpers import lgb_f1_score
-from settings import DATA_PATH
+from settings import DATA_PATH, EXPERIMENT_NAME, TRACKING_URI
 
-
-EXPERIMENT_NAME = "loan-prediction"
 
 logger = logging.getLogger(__name__)
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_tracking_uri(TRACKING_URI)
 mlflow.set_experiment(EXPERIMENT_NAME)
 mlflow.sklearn.autolog()
 
 
-def main_flow(data_path=DATA_PATH):
-    model = Estimator()
-    data = pd.read_csv(data_path)
-    X = data.loc[:, data.columns != "is_bad"]
-    y = data["is_bad"].values
-    best_params = model.tune_parameters(X, y, random_state=42)
-    train_best_model(model, X, y, best_params)
-    register_model()
-
-
+@task
 def train_best_model(model: Estimator, X, y, best_params):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     with mlflow.start_run():
@@ -42,6 +37,7 @@ def train_best_model(model: Estimator, X, y, best_params):
         mlflow.lightgbm.log_model(model.lgb_model, artifact_path="models_mlflow")
 
 
+@task
 def register_model(test_metric='log_loss', registered_model_name='loan-predictor'):
 
     client = MlflowClient()
@@ -63,5 +59,25 @@ def register_model(test_metric='log_loss', registered_model_name='loan-predictor
     )
 
 
+@flow(task_runner=SequentialTaskRunner())
+def main_flow(data_path=DATA_PATH):
+    model = Estimator()
+    data = pd.read_csv(data_path)
+    X = data.loc[:, data.columns != "is_bad"]
+    y = data["is_bad"].values
+    best_params = model.tune_parameters(X, y, random_state=42)
+    train_best_model(model, X, y, best_params)
+    register_model()
+
+
+deployment = Deployment.build_from_flow(
+    flow=main_flow,
+    name="model_training",
+    schedule=IntervalSchedule(interval=timedelta(weeks=1)),
+    work_queue_name="ml",
+    infrastructure=Process()
+)
+
+
 if __name__ == "__main__":
-    main_flow()
+    deployment.apply()
