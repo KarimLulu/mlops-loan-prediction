@@ -126,6 +126,9 @@ Code formatting and code quality checks (`isort`, `black`, `pylint`)
 make quality_checks
 ```
 
+### Pre-commit hooks
+Code formatting [pre-commit](.pre-commit-config.yaml) hooks are triggered on each commit 
+
 ### CI/CD
 PR triggers [CI Workflow](.github/workflows/cd-tests.yaml)
 * Environment setup, Unit tests, and Integration test
