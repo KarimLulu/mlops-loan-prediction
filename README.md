@@ -58,6 +58,8 @@ pipenv run python -m monitoring.send_data
 6. Open [Grafana](http://127.0.0.1:3000/) in the browser and find `Evidently Data Drift Dashboard`
 7. Enjoy the live data drift detection!
 
+![monitoring](./images/monitoring.png)
+
 ### Experimentation and orchestration part
 
 1. Set up the environment and prepare the project
