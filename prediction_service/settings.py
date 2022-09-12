@@ -12,7 +12,7 @@ def init_dirs(*dirs):
 
 
 # Common paths
-REPO_DIR = Path(__file__).parent
+REPO_DIR = Path(__file__).parents[1]
 DATA_DIR = REPO_DIR / "data"
 DATA_NAME = "Lending_Club_reduced.csv"
 DATA_PATH = DATA_DIR / DATA_NAME
@@ -25,7 +25,6 @@ LOG_LEVEL = logging.INFO
 
 
 # Model settings
-EXCLUDE_COLUMNS = ["Id"]
 LGBM_PARAMS = {
     "boosting_type": "gbdt",
     "objective": "binary",
@@ -53,7 +52,6 @@ GRID_SEARCH_PARAMS = {
     "lgbmclassifier__reg_lambda": [1e-2],
 }
 EXPERIMENT_NAME = "loan-prediction"
-TRACKING_URI = "http://host.docker.internal:5000"
 
 
 try:

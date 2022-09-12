@@ -13,7 +13,7 @@ def get_model_location(stage='Production', mlflow_model_name='loan-predictor'):
     return model_uri
 
 
-def load_model(stage, mlflow_model_name):
+def load_model(stage='Production', mlflow_model_name='loan-predictor'):
     model_path = get_model_location(stage=stage, mlflow_model_name=mlflow_model_name)
     model = mlflow.pyfunc.load_model(model_uri=model_path)
     return model
@@ -39,7 +39,7 @@ class ModelService:
         return int(preds[-1])
 
 
-def init_model(stage: str, mlflow_model_name):
+def init_model(stage: str, mlflow_model_name: str):
     model = load_model(stage, mlflow_model_name)
     model_service = ModelService(model=model, model_version=stage)
     return model_service
