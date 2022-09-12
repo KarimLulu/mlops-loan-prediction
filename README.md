@@ -107,3 +107,21 @@ pipenv run prefect deployment run 'main-flow/model_training_workflow'
 pipenv run prefect agent start -q 'mlops'
 ```
 9. Wait until it finishes and registers the new production model.
+
+
+### Run tests and code quality checks
+
+Unit tests
+```
+make test
+```
+
+Integration tests
+```
+make integration_test
+```
+
+Code formatting and code quality checks (`isort`, `black`, `pylint`)
+```
+make quality_checks
+```
