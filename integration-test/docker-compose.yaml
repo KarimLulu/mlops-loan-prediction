@@ -1,0 +1,15 @@
+services:
+  backend:
+    image: ${LOCAL_IMAGE_NAME}
+    ports:
+      - "9696:9696"
+    environment:
+      - AWS_DEFAULT_REGION=eu-west-2
+      - MODEL_LOCATION=/app/model
+      - AWS_ACCESS_KEY_ID=abc
+      - AWS_SECRET_ACCESS_KEY=xyz
+      - TEST_RUN=True
+      - MODEL_STAGE=production
+      - MLFLOW_MODEL_NAME=test-loan-predictor
+    volumes:
+      - "../model:/app/model"

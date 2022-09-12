@@ -19,7 +19,9 @@ DATA_PATH = DATA_DIR / DATA_NAME
 init_dirs(DATA_DIR)
 
 # Logging settings
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(filename)s:%(lineno)s - %(funcName)s - %(message)s"
+LOG_FORMAT = (
+    "%(asctime)s - %(levelname)s - %(filename)s:%(lineno)s - %(funcName)s - %(message)s"
+)
 LOG_DATE_FORMAT = "%d-%m-%Y %H:%M:%S"
 LOG_LEVEL = logging.INFO
 
@@ -44,7 +46,7 @@ LGBM_PARAMS = {
     "metric": "",
     "n_jobs": -1,  # does not influence reproducibility in the latest version.
     "verbose": -1,
-    "first_metric_only": False
+    "first_metric_only": False,
 }
 
 GRID_SEARCH_PARAMS = {
@@ -59,6 +61,4 @@ try:
 except ImportError:
     pass
 
-setup_logging(level=LOG_LEVEL,
-              format=LOG_FORMAT,
-              datefmt=LOG_DATE_FORMAT)
+setup_logging(level=LOG_LEVEL, format=LOG_FORMAT, datefmt=LOG_DATE_FORMAT)

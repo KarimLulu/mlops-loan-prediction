@@ -13,7 +13,7 @@ COPY [ "Pipfile", "Pipfile.lock", "./" ]
 
 RUN pipenv install --system --deploy
 
-COPY [ "service.py", "model_service.py", "settings.py", "./" ]
+COPY [ "prediction_service/service.py", "prediction_service/model_service.py", "prediction_service/settings.py", "./" ]
 
 EXPOSE 9696
 

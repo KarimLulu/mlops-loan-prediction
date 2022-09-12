@@ -29,7 +29,7 @@ class ModelService:
         features = {
             'home_ownership': payload['home_ownership'],
             'emp_length': payload['emp_length'],
-            'annual_inc': payload['annual_inc']
+            'annual_inc': payload['annual_inc'],
         }
         return features
 

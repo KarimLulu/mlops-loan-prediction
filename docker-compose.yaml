@@ -12,7 +12,7 @@ networks:
 services:
   prediction_service:
     build:
-      context: prediction_service
+      context: .
       dockerfile: Dockerfile
     depends_on:
       - evidently_service

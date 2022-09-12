@@ -1,16 +1,14 @@
 import logging
 
-import lightgbm as lgb
 import numpy as np
-import pandas as pd
 import mlflow
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.metrics import log_loss
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import ParameterGrid
-from sklearn.pipeline import make_pipeline
-
+import pandas as pd
+import lightgbm as lgb
 from settings import LGBM_PARAMS, GRID_SEARCH_PARAMS
+from sklearn.metrics import log_loss
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import ParameterGrid, train_test_split
+from sklearn.feature_extraction import DictVectorizer
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +25,9 @@ def add_features(df: pd.DataFrame):
     categorical = ['home_ownership']
     numerical = ['emp_length', 'annual_inc']
     X, y = df.loc[:, categorical + numerical], df['is_bad']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
     train_dicts = X_train.to_dict(orient='records')
     test_dicts = X_test.to_dict(orient='records')
     return train_dicts, test_dicts, y_train, y_test
@@ -42,10 +42,7 @@ def evaluate_model(model, y_test, test_features):
 def tune_parameters(path):
     df = read_dataframe(path)
     train_dicts, test_dicts, y_train, y_test = add_features(df)
-    pipeline = make_pipeline(
-        DictVectorizer(),
-        lgb.LGBMClassifier(**LGBM_PARAMS)
-    )
+    pipeline = make_pipeline(DictVectorizer(), lgb.LGBMClassifier(**LGBM_PARAMS))
     best_loss = -np.inf
     best_params = {}
     for params in ParameterGrid(GRID_SEARCH_PARAMS):

@@ -1,28 +1,26 @@
 import os
 
-from flask import Flask, request, jsonify
 import mlflow
-from pymongo import MongoClient
 import requests
-
+from flask import Flask, jsonify, request
+from pymongo import MongoClient
 from model_service import init_model
-
 
 EVIDENTLY_SERVICE_ADDRESS = os.getenv("EVIDENTLY_SERVICE", "http://127.0.0.1:9897")
 MONGODB_ADDRESS = os.getenv("MONGODB_ADDRESS", "mongodb://127.0.0.1:27017")
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://host.docker.internal:5000")
+MLFLOW_TRACKING_URI = os.getenv(
+    "MLFLOW_TRACKING_URI", "http://host.docker.internal:5000"
+)
 MODEL_STAGE = os.getenv('MODEL_STAGE', 'production')
 MLFLOW_MODEL_NAME = os.getenv('MLFLOW_MODEL_NAME', 'loan-predictor')
+TEST_RUN = os.getenv('TEST_RUN', 'False') == 'True'
 
 mongo_client = MongoClient(MONGODB_ADDRESS)
 db = mongo_client.get_database("prediction_service")
 collection = db.get_collection("data")
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-model_service = init_model(
-    stage=MODEL_STAGE,
-    mlflow_model_name=MLFLOW_MODEL_NAME
-)
+model_service = init_model(stage=MODEL_STAGE, mlflow_model_name=MLFLOW_MODEL_NAME)
 app = Flask('loan-prediction')
 
 
@@ -33,10 +31,11 @@ def predict_endpoint():
 
     result = {
         'is_bad_loan': pred,
-        'model_version': f"{MLFLOW_MODEL_NAME}/{MODEL_STAGE}"
+        'model_version': f"{MLFLOW_MODEL_NAME}/{MODEL_STAGE}",
     }
-    save_to_db(payload, pred)
-    send_to_evidently_service(payload, pred)
+    if not TEST_RUN:
+        save_to_db(payload, pred)
+        send_to_evidently_service(payload, pred)
     return jsonify(result)
 
 
