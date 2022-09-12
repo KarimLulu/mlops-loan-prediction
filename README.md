@@ -127,5 +127,5 @@ make quality_checks
 ```
 
 ### CI/CD
-Create a PR (feature branch): [CI Workflow](.github/workflows/cd-tests.yaml)
+PR triggers [CI Workflow](.github/workflows/cd-tests.yaml)
 * Environment setup, Unit tests, and Integration test
