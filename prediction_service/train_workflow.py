@@ -1,16 +1,14 @@
 import os
 import logging
-from datetime import timedelta
 
 import mlflow
 from prefect import flow, task
-from settings import DATA_PATH, EXPERIMENT_NAME
 from mlflow.tracking import MlflowClient
 from prefect.deployments import Deployment
 from prefect.task_runners import SequentialTaskRunner
 from prefect.infrastructure import Process
-from prefect.orion.schemas.schedules import IntervalSchedule
 
+from prediction_service.settings import DATA_PATH, EXPERIMENT_NAME
 from prediction_service.estimator import (
     add_features,
     evaluate_model,
@@ -77,9 +75,8 @@ def main_flow(data_path=DATA_PATH):
 
 deployment = Deployment.build_from_flow(
     flow=main_flow,
-    name="model_training",
-    schedule=IntervalSchedule(interval=timedelta(weeks=1)),
-    work_queue_name="ml",
+    name="model_training_workflow",
+    work_queue_name="mlops",
     infrastructure=Process(),
 )
 

@@ -4,11 +4,12 @@ import numpy as np
 import mlflow
 import pandas as pd
 import lightgbm as lgb
-from settings import LGBM_PARAMS, GRID_SEARCH_PARAMS
 from sklearn.metrics import log_loss
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import ParameterGrid, train_test_split
 from sklearn.feature_extraction import DictVectorizer
+
+from prediction_service.settings import LGBM_PARAMS, GRID_SEARCH_PARAMS
 
 logger = logging.getLogger(__name__)
 
