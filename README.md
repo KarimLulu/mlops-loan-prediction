@@ -94,7 +94,7 @@ export BUCKET_NAME=s3-bucket-name
 ```
 pipenv run mlflow server --default-artifact-root s3://$BUCKET_NAME --backend-store-uri sqlite:///mlflow_db.sqlite
 ```
-6. Create deployment for the flow
+6. Create the deployment for the training pipeline
 ```
 pipenv run python -m prediction_service.train_workflow
 ```
