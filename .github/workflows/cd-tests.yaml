@@ -31,7 +31,7 @@ jobs:
 
       - name: Lint
         working-directory: "."
-        run: pipenv run pylint --recursive=y .
+        run: pipenv run pylint --recursive=y prediction_service
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
