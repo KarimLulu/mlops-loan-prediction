@@ -13,8 +13,8 @@ COPY [ "Pipfile", "Pipfile.lock", "./" ]
 
 RUN pipenv install --system --deploy
 
-COPY [ "prediction_service/predict.py", "./" ]
+COPY [ "prediction_service/service.py", "prediction_service/model_service.py", "settings.py", "./" ]
 
 EXPOSE 9696
 
-ENTRYPOINT [ "gunicorn", "--bind=0.0.0.0:9696", "predict:app" ]
+ENTRYPOINT [ "gunicorn", "--bind=0.0.0.0:9696", "service:app" ]

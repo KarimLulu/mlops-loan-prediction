@@ -1,4 +1,5 @@
 from datetime import timedelta
+import os
 import logging
 
 import mlflow
@@ -59,9 +60,10 @@ def register_model(test_metric='log_loss', registered_model_name='loan-predictor
 
 #@flow(task_runner=SequentialTaskRunner())
 def main_flow(data_path=DATA_PATH):
+    registered_model_name = os.getenv('MLFLOW_MODEL_NAME', 'loan-predictor')
     best_params, model = tune_parameters(data_path)
     train_best_model(model, data_path, best_params)
-    register_model()
+    register_model(registered_model_name=registered_model_name)
 
 
 # deployment = Deployment.build_from_flow(
