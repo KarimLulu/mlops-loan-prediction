@@ -11,6 +11,7 @@ disable = [
     "import-error",
     "logging-fstring-interpolation",
     "wildcard-import",
+    "missing-timeout"
 ]
 
 [tool.black]
