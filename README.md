@@ -4,10 +4,10 @@ This is the final project for the [MLOps ZoomCamp](https://github.com/DataTalksC
 
 ## Problem Statement
 
-We need to build the end-to-end machine learning system that predicts whether a particular user returns the loan or not. 
+We need to build an end-to-end machine learning system that predicts whether a particular user returns the loan or not. 
 We access the probability of full repayment based on various features - employment length, annual income, home ownership status, etc. 
 
-It should be a fault-tolerant, monitored, and containerized web service that receives object's features and returns whether the loan will be repaid.
+It should be a fault-tolerant, monitored, and containerized web service that receives the object's features and returns whether the loan will be repaid.
 
 ## System Description
 The system contains the following parts:
@@ -55,5 +55,55 @@ docker-compose up
 make setup
 pipenv run python -m monitoring.send_data
 ```
-6. Open [Grafana](http://127.0.0.1:3000/) in the browser and find `Evidently Data Drift Dashboard`.
+6. Open [Grafana](http://127.0.0.1:3000/) in the browser and find `Evidently Data Drift Dashboard`
 7. Enjoy the live data drift detection!
+
+### Experimentation and orchestration part
+
+1. Set up the environment and prepare the project
+```
+make setup
+```
+2. Start Prefect server
+```
+pipenv run prefect orion start --host 0.0.0.0
+```
+3. Install [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and configure AWS profile
+
+  * If you've already created an AWS account, head to the IAM section, generate your secret-key, and download it locally. 
+  [Instructions](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-prereqs.html)
+
+  * [Configure](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) `aws-cli` with your downloaded AWS secret keys:
+      ```shell
+         $ aws configure
+         AWS Access Key ID [None]: xxx
+         AWS Secret Access Key [None]: xxx
+         Default region name [None]: eu-west-1
+         Default output format [None]:
+      ```
+
+  * Verify aws config:
+      ```shell
+        $ aws sts get-caller-identity
+      ```
+4. Set S3 bucket
+```
+export BUCKET_NAME=s3-bucket-name
+```
+5. Run MLFlow server
+```
+pipenv run mlflow server --default-artifact-root s3://$BUCKET_NAME --backend-store-uri sqlite:///mlflow_db.sqlite
+```
+6. Create deployment for the flow
+```
+pipenv run python -m prediction_service.train_workflow
+```
+7. Run the deployment
+```
+pipenv run prefect deployment run 'main-flow/model_training_workflow'
+```
+8. Run the agent
+```
+pipenv run prefect agent start -q 'mlops'
+```
+9. Wait until it finishes and registers the new production model.
