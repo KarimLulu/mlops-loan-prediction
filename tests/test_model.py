@@ -8,7 +8,7 @@ def test_prepare_features():
         'home_ownership': 'MORTGAGE',
         'emp_length': 10,
         'annual_inc': 150_000,
-        'id': 10,
+        'id': 11,
         'verif_status': 0,
     }
 
